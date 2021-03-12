@@ -13,6 +13,7 @@ class Logger {
         static void info(CoStringR, int level = 0);             
         static void error(CoStringR, int level = 0);
         static void progress(CoStringR, int level = 0); 
+        static void question(CoStringR, int level = 0);
 
     private:
         static void out(std::ostream &, char, CoStringR);
@@ -23,6 +24,7 @@ class Logger {
             Info = 0,
             Error,
             Progress,
+            Question,
             Count
         };
 

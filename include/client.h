@@ -15,6 +15,8 @@ class Client {
         bool isConnectedToServer() const;
         bool receiveMessage(std::string &message) const;
 
+        bool portIsFree(int port) const;
+
     private:
         Connection *m_Connection;
 };

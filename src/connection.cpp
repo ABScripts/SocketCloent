@@ -77,7 +77,7 @@ bool Connection::sendMessage(const std::string &message)
     bool sent = false;
     if (m_Socket != nullptr)
     {
-        if (opened() || connected())
+        if (isOpened() || isConnected())
         {
             sent = m_Socket->send(message);
         }
@@ -91,7 +91,7 @@ bool Connection::receiveMessage(std::string &message) const
     bool received = false;
     if (m_Socket != nullptr)
     {
-        if (opened() || connected())
+        if (isOpened() || isConnected())
         {
             message = m_Socket->receive();
 
@@ -116,7 +116,7 @@ bool Connection::changePort(int newPort)
 {
     if (m_Socket != nullptr)
     {
-        if (m_Port == newPort)
+        if (!isAllowedChangingPortTo(newPort))
         {
             return false;
         }
@@ -145,10 +145,11 @@ bool Connection::changePort(int newPort)
                 m_HoldingSocket = m_Socket;                     // save old socket to notify client
 
                 m_Socket = newSocket;                          // point to the new socket
-                m_Port = newPort;                                   
+                m_Port = newPort;  
+                                            
+                return true;
             }
         }
-        return true;
     }
     return false;
 }
@@ -169,17 +170,22 @@ bool Connection::tellClientToRebase(const std::string &rebaseMessage) // void ?
     return false;
 }
 
-bool Connection::opened() const 
+bool Connection::isAllowedChangingPortTo(int port) const
+{
+    return (port != m_Port);
+}
+
+bool Connection::isOpened() const 
 {
     return m_Flags[Flags::InitialisationStatus];
 }
 
-bool Connection::connected() const
+bool Connection::isConnected() const
 {
     return m_Flags[Flags::ConnectionStatus];
 }
 
-bool Connection::disconnected() const
+bool Connection::isDisconnected() const
 {
     return m_Flags[Flags::DisconnectionStatus];
 }

@@ -44,10 +44,15 @@ bool Server::waitForClient(const std::string &rebaseMessage) const
 
 bool Server::openedConnection() const
 {
-    return m_Connection->opened();
+    return m_Connection->isOpened();
 }
 
 bool Server::clientDisconnected() const
 {
-    return m_Connection->disconnected();
+    return m_Connection->isDisconnected();
+}
+
+bool Server::portIsFree(int port) const
+{
+    return m_Connection->isAllowedChangingPortTo(port);
 }

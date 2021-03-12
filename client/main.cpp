@@ -52,7 +52,47 @@ void receiveMessagesWorkflow(Client *client)
             }
             else
             {
-                std::cout << "Server> " << message << std::endl;
+                int port = portRequest(message);
+                if (port != -1)
+                {
+                    client->sendMessage(successMessageServer);
+
+                    while (true)  // waiting for server`s confirmation
+                    {
+                        bool received = client->receiveMessage(message);
+
+                        if ( message.size() == failureMessageServer.size() ||
+                             message.size() == successMessageServer.size()   )
+                        {
+                            if (message == failureMessageServer)
+                            {
+                                Logger::error("Server can`t change port or some error occured.");
+                                break;
+                            }
+                            else if (message == successMessageServer)
+                            {
+                                Logger::progress("Changing port...");
+                                while (!client->connectToServer("127.0.0.1", port))
+                                {
+                                    usleep(sleepTime);
+
+                                    Logger::error("Failed connect to the server");
+                                }
+
+                                Logger::info("Port number changed.");
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            std::cout << "Server> " << message << std::endl;
+                        }
+                    }
+                }
+                else
+                {
+                    std::cout << "Server> " << message << std::endl;
+                }
             }
         }
     }
@@ -76,10 +116,19 @@ int main()
             std::cout << "> ";
             std::getline(std::cin, message);
 
-            unsigned int portNumber = portRequest(message);
+            int portNumber = portRequest(message);
             if (portNumber != -1)
             {
-                newPortNumber = portNumber;
+                if (client.portIsFree(portNumber))
+                {
+                    newPortNumber = portNumber;
+                    std::cout << portNumber << " is free\n";
+                }
+                else
+                {
+                    Logger::error("Port #" + std::to_string(portNumber) + " is already taken.");
+                    continue;
+                }
             }
 
             bool sent = client.sendMessage(message);
@@ -103,7 +152,7 @@ int main()
     usleep(sleepTime * 100); // test thing
 }
 
-static int portRequest(const std::string &message)
+static int portRequest(const std::string &message)      // use regexp ?
 {
     if (message.size() >= 10 && message.size() <= 15)
     {

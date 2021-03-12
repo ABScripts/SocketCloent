@@ -30,7 +30,7 @@ bool Client::receiveMessage(std::string &message) const
 
 bool Client::isConnectedToServer() const
 {
-    return m_Connection->connected();
+    return m_Connection->isConnected();
 }
 
 bool Client::connectToServer(const std::string &ip, int port)
@@ -49,4 +49,9 @@ bool Client::connectToServer(const std::string &ip, int port)
     }
 
     return true;
+}
+
+bool Client::portIsFree(int port) const
+{
+    return m_Connection->isAllowedChangingPortTo(port);
 }

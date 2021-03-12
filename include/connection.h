@@ -29,11 +29,13 @@ class Connection {
         bool receiveMessage(std::string &message) const;
         bool changePort(int newPort);
 
-        bool opened() const;
-        bool connected() const;
-        bool disconnected() const;
-        bool tellClientToRebase(const std::string &rebaseMessage);
+        bool isOpened() const;
+        bool isConnected() const;
+        bool isDisconnected() const;
+        bool isAllowedChangingPortTo(int port) const;
 
+        bool tellClientToRebase(const std::string &rebaseMessage);\
+        
     private:
         int m_Port;
         std::string m_Ip;

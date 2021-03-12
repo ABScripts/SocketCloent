@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-std::array<char, Logger::Sign::Count> Logger::m_Signs = {'i', '!', '~'};
+std::array<char, Logger::Sign::Count> Logger::m_Signs = {'i', '!', '~', '?'};
 std::mutex Logger::m_Mutex;
 
 void Logger::out(std::ostream &ostream, char sign, CoStringR message)
@@ -25,6 +25,11 @@ void Logger::error(CoStringR message, int level)
 void Logger::progress(CoStringR message, int level) 
 {
     out(std::cout, m_Signs[Sign::Progress], message);
+}
+
+void Logger::question(CoStringR message, int level)
+{
+    out(std::cout, m_Signs[Sign::Question], message);
 }
 
 void Logger::addLogLevel(unsigned short logLevel)
