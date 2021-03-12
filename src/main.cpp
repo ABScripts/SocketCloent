@@ -3,6 +3,9 @@
 #include <thread>
 
 #include "../include/server.h"
+#include "../include/logger.h"
+
+const static unsigned int sleepTime { 500000 };
 
 static const int newPortTest { 50400 };
 
@@ -13,13 +16,13 @@ void receiveMessagesWorkflow(Server *server_p)
     std::string message;
     while (!server.clientDisconnected())
     {
-        usleep(50000);
+        usleep(sleepTime);
 
         bool received = server.receiveMessage(message);
 
         if (!received)
         {
-            std::cout << "Error while receiving message\n";
+            Logger::error("Error while receiving message");
         }
         else
         {
@@ -29,13 +32,12 @@ void receiveMessagesWorkflow(Server *server_p)
 
                     if (!changed)
                     {
-                        std::cout << "Failed to change port!\n";
-
+                        Logger::error("Failed to change port!");
                         server.sendMessage("failure");
                     }
                     else
                     {
-                        std::cout << "Port changed! Waiting for client to connect...\n";
+                        Logger::progress("Port changed! Waiting for client to connect...");
 
                         bool clientConnected  = server.waitForClient("success");
 
@@ -43,7 +45,7 @@ void receiveMessagesWorkflow(Server *server_p)
 
                         if (!clientConnected)
                         {
-                            std::cerr << "Client failed to connect!";
+                            Logger::error("Client failed to connect!");
                             return;
                         }
                     }
@@ -56,29 +58,29 @@ void receiveMessagesWorkflow(Server *server_p)
 }
 
 int main() {
-    try
-    {
+    
         Server server("127.0.0.1", 7300);
 
         if (server.openedConnection())
         {
-            std::cout << "Server started\nWaiting for client to connect...\n";
+            Logger::info("Server started");
+            Logger::progress("Waiting for client to connect...");
 
             bool clientConnected  = server.waitForClient();
             if (!clientConnected)
             {
-                std::cerr << "Client failed to connect!";
+                Logger::error("Client failed to connect.");
                 return -1;
             }
 
             std::thread receiveMessagesFromClientThread(receiveMessagesWorkflow, &server);
 
-            std::cout << "Client connected, waiting for messages...\n";
+            Logger::progress("Client connected, waiting for messages...");
 
             std::string message;
             while (!server.clientDisconnected())
             {
-                usleep(2000);
+                usleep(sleepTime);
                 
                 std::cout << "> ";
                 std::getline(std::cin, message);
@@ -86,22 +88,18 @@ int main() {
 
                 if (!sent)
                 {
-                    std::cerr << "Failed to send message!\n";
+                    Logger::error("Failed to send message.");
                 }
-            
             }
-            std::cerr << "Client disconnected\n";
+
+            Logger::error("Client disconnected");
 
             receiveMessagesFromClientThread.join();
         }
         else
         {
-            std::cout << "Failed to open connection\n";
+            Logger::error("Failed to open connection");
         }
-    }
-    catch(...)
-    {
-        usleep(10000000);
-    }
 
+    usleep(sleepTime * 100);
 }

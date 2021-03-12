@@ -118,7 +118,7 @@ namespace network {
         }
         else
         {
-            return std::string(m_Buffer, bytesReceived);
+            return std::string(m_Buffer, bytesReceived-1);
         }
 
         return {};

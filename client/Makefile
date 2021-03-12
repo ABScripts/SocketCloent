@@ -1,10 +1,10 @@
 a.out: main.o
-	@g++ -o a.out  main.o socket.o unixsock.o winsock.o connection.o client.o peermanager.o -pthread
+	@g++ -o a.out  main.o socket.o unixsock.o winsock.o connection.o client.o peermanager.o logger.o -pthread
 
 main.o: client.o peermanager.o
 	@g++ -c main.cpp
 
-client.o: connection.o
+client.o: connection.o logger.o
 	@g++ -c ../src/client.cpp
 
 peermanager.o:
@@ -22,5 +22,8 @@ unixsock.o:
 winsock.o:
 	@g++ -c ../src/network/winsock.cpp
 
+logger.o:
+	@g++ -c ../src/logger.cpp
+
 clean:
-	@rm a.out main.o socket.o unixsock.o winsock.o connection.o client.o
+	@rm a.out main.o socket.o unixsock.o winsock.o connection.o client.o logger.o
