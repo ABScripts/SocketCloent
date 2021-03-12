@@ -6,7 +6,7 @@
 Server::Server(const std::string &ip, int port)
     : m_Connection { PeerManager::openConnection(ip, port) }
 {
-    std::cout << "Server body!\n";
+
 }
 
 Server::~Server()

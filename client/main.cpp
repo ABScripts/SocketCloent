@@ -5,13 +5,43 @@
 #include "../include/client.h"
 #include <thread>
 
+/*
+    Types of print messages:
+    
+    [i] - information
+    [~] - something in progress
+    [!] - error
+*/
+
+const static std::string infoPrint = "[i]";
+const static std::string errorPrint = "[!]";
+const static std::string progressPrint = "[~]";
+
 const static std::string failureMessageServer = "failure";
 const static std::string successMessageServer = "success";
 
+static void out(std::ostream &ostream, const std::string & signPrint, const std::string &message)
+{
+    ostream << signPrint << " " << message << std::endl;
+}
+
+static void info(const std::string &message)
+{
+    out(std::cout, infoPrint, message);
+}
+
+static void error(const std::string &message)
+{
+    out(std::cerr, errorPrint, message);
+}
+
+static void progress(const std::string &message)
+{
+    out(std::cout, progressPrint, message);
+}
+
 void receiveMessagesWorkflow(Client *client)
 {
-//    Client &client = *client_p;
-
     std::string message;
     while (true)
     {
@@ -21,26 +51,31 @@ void receiveMessagesWorkflow(Client *client)
 
         if (!received)
         {
-            std::cout << "Error while receiving message\n";
+            error("Error while receiving message.");
         }
         else
         {
-            if (message.size() == 8)
+            if ( (message.size()-1) == failureMessageServer.size() ||
+                 (message.size()-1) == successMessageServer.size()   )
             {
                 if (message.compare(0, 7, "failure") == 0 )
+                //if (message == failureMessageServer)
                 {
-                    std::cout << "Server rejected to change port or some error occured\n";
+                    error("Server rejected to change port or some error occured.");
                 }
+                //else if (message == successMessageServer)
                 else if (message.compare(0, 7, "success") == 0)
                 {
-                    std::cout << "Changing port...\n";
-                    std::cout << "WWWWWW!\n";
+                     progress("Changing port...");
+                   // std::cout << "WWWWWW!\n";
                     
                     while (!client->connectToServer("127.0.0.1", 50400))
                     {
                         usleep(500000);
 
-                        std::cerr << "Failed connect to the server!";
+                        error("Failed connect to the server");
+
+                        // std::cerr << "Failed connect to the server!";
                     }
 
                     // Client * newClient = new Client("127.0.0.1", 50400);
@@ -59,7 +94,8 @@ void receiveMessagesWorkflow(Client *client)
 
                     // if (connected)
                     // {
-                       std::cerr << "Port number changed!\n"; 
+                    info("Port number changed.");
+                       //std::cerr << "Port number changed!\n"; 
                     // }
                     // else
                     // {
@@ -73,7 +109,7 @@ void receiveMessagesWorkflow(Client *client)
             }
             else
             {
-                std::cout << "Mesasge size: " << message.size() << "\n";
+               // std::cout << "Mesasge size: " << message.size() << "\n";
                 std::cout << "Server> " << message << std::endl;
             }
         }
@@ -82,41 +118,43 @@ void receiveMessagesWorkflow(Client *client)
 
 int main()
 {
+    std::cout << failureMessageServer.size();
     Client client("127.0.0.1", 7300);
 
     if (client.isConnectedToServer())
     {
-        std::cout << "Connected to the server\n";
+        info("Connected to the server.");
 
         std::thread receiveMessageFromServerThread(receiveMessagesWorkflow, &client);
 
         std::string message;
         while (true)
         {
-           // usleep(50000);
+           usleep(50000);
 
-            // std::cout << "> ";
-            // std::getline(std::cin, message);
+            std::cout << "> ";
+            std::getline(std::cin, message);
 
-            bool sent = client.sendMessage("newPort");
-            break;
-            // if (!sent)
-            // {
-            //     std::cerr << "Failed to send message!";
-            //     return -1;
-            // }
+            bool sent = client.sendMessage(message);
+
+            if (!sent)
+            {
+                error("Failed to send message.");
+                return -1;
+            }
         }   
 
-        std::cerr << "Waiting for receiving...\n";
+        // std::cerr << "Waiting for receiving...\n";
 
        receiveMessageFromServerThread.join();
     }
     else
     {
-        std::cerr << "Failed to connect to the server!";
+        error("Failed to connect to the server.");
     }
 
-    std::cerr << "Closed connection\n";
+    info("Client shutted down.");
+    // std::cerr << "Closed connection\n";
 
     usleep(10000000);
 }

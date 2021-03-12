@@ -1,4 +1,5 @@
 #include <exception>
+#include <iostream>
 
 #include "../include/peermanager.h"
 
@@ -7,7 +8,6 @@ Connection * PeerManager::getConnection(const std::string &ip, int port, Connect
     Connection *connection;
     try
     {
-        std::cerr << "Opening connection...\n";
         connection = new Connection(ip, port, action);
     }
     catch(const std::bad_alloc&)

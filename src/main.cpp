@@ -10,8 +10,6 @@ void receiveMessagesWorkflow(Server *server_p)
 {
     Server &server = *server_p;
 
-    try
-    {
     std::string message;
     while (!server.clientDisconnected())
     {
@@ -50,24 +48,18 @@ void receiveMessagesWorkflow(Server *server_p)
                         }
                     }
                 }
-            {
+    
                 std::cout << "Client> " << message << std::endl;
-            }
+            
         }
-    }
-    }
-    catch(...)
-    {
-        usleep(1000000);
     }
 }
 
 int main() {
     try
     {
-        std::cerr << "Trying create server...\n";
         Server server("127.0.0.1", 7300);
-        std::cerr << "Banch";
+
         if (server.openedConnection())
         {
             std::cout << "Server started\nWaiting for client to connect...\n";

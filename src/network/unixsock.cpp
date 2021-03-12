@@ -12,9 +12,7 @@ namespace network {
 
     TcpUnixSocket::TcpUnixSocket()
     {
-        std::cerr << "Creating UnixSocket...\n";
         m_Descriptor = socket(AF_INET, SOCK_STREAM, 0);
-        std::cerr << "Hmmmmmmmmmmm...\n";
 
         if (m_Descriptor == -1)
         {

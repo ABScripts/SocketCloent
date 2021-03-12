@@ -13,9 +13,7 @@ Connection::Connection(const std::string &ip, int port, Action action)
     , m_Port (port)
     , m_HoldingSocket (nullptr)
 {
-    std::cerr << "Creating socket\n";
     m_Socket = network::TcpSocket::create();
-    std::cerr << "Socket created\n";
 
     if (m_Socket->getLastError() != TcpSocket::Error::Error_CreationSocket)     // if opened OK
     {

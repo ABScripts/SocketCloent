@@ -1,5 +1,5 @@
 #include <exception>
-// #include <string.h>
+#include <string.h>
 
 #include "../../include/network/socket.h"
 #ifdef __linux__
@@ -18,7 +18,6 @@ namespace network {
         try
         {
             #ifdef __linux__
-            std::cerr << "Magic\n";
                 socket = new TcpUnixSocket();
             #elif _WIN32
                 socket = new WinSocket();
@@ -26,20 +25,17 @@ namespace network {
         }
         catch(const std::bad_alloc& _)
         {
-            std::cerr << "Bad alloc\n";
             socket = nullptr;
         }
-        std::cerr << "Returnung shit...\n";
+
         return socket;
     }
 
     TcpSocket::TcpSocket() 
         : m_LastError(Error::Error_None)
     {
-        std::cerr << "Making socket...\n";
-        // memset(m_Buffer, 0, m_BufferSize);
-        // memset(&m_DestinationHint, 0, sizeof(sockaddr_in));
-        std::cerr << "Made socket for TcpSocket...\n";
+        memset(m_Buffer, 0, m_BufferSize);
+        memset(&m_DestinationHint, 0, sizeof(sockaddr_in));
     }
 
     TcpSocket::~TcpSocket()
