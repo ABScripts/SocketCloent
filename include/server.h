@@ -10,10 +10,11 @@ class Server {
         ~Server();
 
         bool waitForClient() const;
-        bool waitForClient(const std::string &rebaseMessage) const; // used for poert changing
         bool sendMessage(const std::string &message);
         bool receiveMessage(std::string &message) const;
+        
         bool changePort(int newPort);
+        bool waitForClient(const std::string &rebaseMessage) const; 
 
         bool openedConnection() const;
         bool clientDisconnected() const;

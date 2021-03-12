@@ -10,12 +10,10 @@ class Client {
         ~Client();
 
         bool sendMessage(const std::string &message);
-
-        bool receiveMessage(std::string &message) const;
+        bool connectToServer(const std::string &ip, int port);
 
         bool isConnectedToServer() const;
-
-        bool connectToServer(const std::string &ip, int port);
+        bool receiveMessage(std::string &message) const;
 
     private:
         Connection *m_Connection;

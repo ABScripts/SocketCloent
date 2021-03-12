@@ -1,11 +1,16 @@
 #include <mutex>
 #include <array>
 
+/*
+TODO: 
+    1) Add level-logging
+*/
+
 class Logger {
     using CoStringR = const std::string &;
 
     public:
-        static void info(CoStringR, int level = 0);
+        static void info(CoStringR, int level = 0);             
         static void error(CoStringR, int level = 0);
         static void progress(CoStringR, int level = 0); 
 

@@ -21,7 +21,6 @@ class Connection {
         static const unsigned char m_FlagsArraySize;
 
     public:
-        // opens/creates new connection
         Connection(const std::string &ip, int port, Action action);
         ~Connection();
 
@@ -33,19 +32,14 @@ class Connection {
         bool opened() const;
         bool connected() const;
         bool disconnected() const;
-
-        // test stuff
         bool tellClientToRebase(const std::string &rebaseMessage);
 
     private:
-        network::TcpSocket *m_Socket;
-        mutable std::vector<bool> m_Flags;
-
-        // test stuff
-        std::string m_Ip;
         int m_Port;
-
+        std::string m_Ip;
+        network::TcpSocket *m_Socket;
         network::TcpSocket *m_HoldingSocket;
+        mutable std::vector<bool> m_Flags;
 
     friend class PeerManager;
 };

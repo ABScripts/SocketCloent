@@ -23,7 +23,7 @@ Connection::Connection(const std::string &ip, int port, Action action)
 
             if (isBinded)
             {
-                bool isListening = m_Socket->listen();   // i am not sure whether to use the previous bool variable 
+                bool isListening = m_Socket->listen();                          // i am not sure whether to use the previous bool variable 
 
                 if (isListening)
                 {
@@ -34,7 +34,7 @@ Connection::Connection(const std::string &ip, int port, Action action)
         }
         else if (action == Action::Connect)                                     // decide what to do next - connect to the server
         {
-           bool isConnected = m_Socket->connect(ip, port);      // maybe I shold create a shared bool-var for these results ?
+           bool isConnected = m_Socket->connect(ip, port);                      // maybe I shold create a shared bool-var for these results ?
 
             if (isConnected)
             {
@@ -48,7 +48,6 @@ Connection::Connection(const std::string &ip, int port, Action action)
     m_Port = 0;     // fields accordingly - so actually no active ip/port for that connection
 
     delete m_Socket;
-
     m_Socket = nullptr;
 }
 
@@ -119,7 +118,6 @@ bool Connection::changePort(int newPort)
     {
         if (m_Port == newPort)
         {
-            //std::cerr << "Exact same port already. Abort...\n";
             return false;
         }
 
@@ -131,7 +129,6 @@ bool Connection::changePort(int newPort)
 
             if (!isBinded)
             {
-                //std::cerr << "Failed to bind new port. Abort...\n";
                 // delete newSocket; -> should be added
                 return false;
             }
@@ -141,7 +138,6 @@ bool Connection::changePort(int newPort)
 
                 if (!listening)
                 {
-                   // std::cerr << "Failed to listen for new socket [port changing]!\n";
                     // delete newSocket;
                     return false;
                 }
@@ -161,42 +157,16 @@ bool Connection::tellClientToRebase(const std::string &rebaseMessage) // void ?
 {
     if (m_HoldingSocket && m_Socket)
     {
- //   std::cerr << "Started rebasing...\n";
         while ( !m_HoldingSocket->send(rebaseMessage) )             // try to send message to client 
         {
-            std::cerr << "Sending message to client...\n";
             usleep(1000000);
         }
 
-        std::cerr << "Message sent!\n";
-
-    // std::cerr << "Started closing old socket...\n";
-    //    if (m_HoldingSocket != nullptr)
-    //    {
-    //        std::cerr << "Try deleting\n";
-        delete m_HoldingSocket; // do in the different thread
+        delete m_HoldingSocket;      // do that in a different thread
         m_HoldingSocket = nullptr;
-        std::cerr << "Deleted\n";
-    // }
         return true;
     }
     return false;
-//    bool closed = m_HoldingSocket->close();
-
-//     if (!closed)                                                                // if we can not close the previous socket, 
-//     {                                                                           // we should not open a new one
-//         std::cerr << "Failed to close old port, invalid descriptor. Abort...\n";
-
-//         // newSocket->close();                         // if invalid descriptor provided for that one - don`t care
-//         // try run new thread here to run this socket ???
-//         return false;
-//     }   
-//     else
-//     {
-       
-//          //  std::cerr << "Closed rebasing...\n";
-//    } 
-     //  std::cerr << "No problems with tellThe...\n";
 }
 
 bool Connection::opened() const 

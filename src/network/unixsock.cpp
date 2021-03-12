@@ -28,11 +28,11 @@ namespace network {
     bool TcpUnixSocket::close() const 
     {
         int res = 0;    
-        while ( res = ::close(m_Descriptor) ) // try to close the old one
+        while ( res = ::close(m_Descriptor) )   // try to close the old one
         {
-            if (errno != EINTR && errno != EIO) // those problems could be resolved in repeat call to close
+            if (errno != EINTR && errno != EIO) // those problems could be resolved via the repeat call to close()
             {
-                break;                          // if some else kind of problems occured we could not close the socket
+                break;                          // if some else kind of problems occured we couldn`t close the socket
             }
         }
 
@@ -47,12 +47,12 @@ namespace network {
  
         int res = ::bind(m_Descriptor, (sockaddr*)&m_DestinationHint, sizeof(sockaddr_in)); 
 
-        return operationStatus(res);         // I could also use    return res ?;
+        return operationStatus(res);               // I could also use    return res ?;
     }
 
     bool TcpUnixSocket::listen()
     {   
-        // Should I wrap around lib methods in namespace to avoid using :: in that case
+        // Should I wrap around unix specific methods in namespace to avoid using :: in that case
         // OR
         // Just change my TcpUnixSocket method`s name?
 
@@ -103,7 +103,7 @@ namespace network {
     std::string TcpUnixSocket::receive() const 
     {
         // TODO: 
-        // Receive all the data from the socket - hint: use timer to accomplish that
+        // Receiving of long messages from the socket - hint: use timer to accomplish that
         memset((void *)&m_Buffer, 0, m_BufferSize);
 
         ssize_t bytesReceived = recv(m_Descriptor, (void*)&m_Buffer, m_BufferSize, 0);

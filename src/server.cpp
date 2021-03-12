@@ -16,7 +16,6 @@ Server::~Server()
 
 bool Server::sendMessage(const std::string &message)
 {
-    // check for nullptr connection first
     return m_Connection->sendMessage(message);
 }
 
@@ -37,15 +36,8 @@ bool Server::waitForClient() const
 
 bool Server::waitForClient(const std::string &rebaseMessage) const
 {
-    std::cerr << "Waiting for...\n";
-
     bool rebasing = m_Connection->tellClientToRebase(rebaseMessage);
-
-    std::cout << "Waiting next...\n";
-
     bool waiting =  waitForClient();
-
-    std::cout << "Rebasing: " << rebasing << " waiting: " << waiting << std::endl;
 
     return rebasing && waiting;
 }
