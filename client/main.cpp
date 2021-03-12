@@ -6,16 +6,20 @@
 #include "../include/client.h"
 #include <thread>
 
+static int portRequest(const std::string &message);
+
 const static std::string failureMessageServer { "failure" };
 const static std::string successMessageServer { "success" };
 const static unsigned int sleepTime { 500000 };
+
+volatile int newPortNumber = -1;
 
 void receiveMessagesWorkflow(Client *client)
 {
     std::string message;
     while (true)
     {
-        usleep(50000);
+        usleep(sleepTime);
 
         bool received = client->receiveMessage(message);
 
@@ -36,7 +40,7 @@ void receiveMessagesWorkflow(Client *client)
                 {
                     Logger::progress("Changing port...");
                     
-                    while (!client->connectToServer("127.0.0.1", 50400))
+                    while (!client->connectToServer("127.0.0.1", newPortNumber))
                     {
                         usleep(sleepTime);
 
@@ -72,6 +76,12 @@ int main()
             std::cout << "> ";
             std::getline(std::cin, message);
 
+            unsigned int portNumber = portRequest(message);
+            if (portNumber != -1)
+            {
+                newPortNumber = portNumber;
+            }
+
             bool sent = client.sendMessage(message);
 
             if (!sent)
@@ -91,4 +101,26 @@ int main()
     Logger::info("Client shutted down.");
 
     usleep(sleepTime * 100); // test thing
+}
+
+static int portRequest(const std::string &message)
+{
+    if (message.size() >= 10 && message.size() <= 15)
+    {
+        if (message.compare(0, 9, "NewPort-<") == 0)
+        {
+            std::string number;
+            number.reserve();
+            for (unsigned int i = 9; i < message.size(); ++i)
+            {
+                if (message[i] == '>')
+                {
+                    return std::stoi(number);
+                }
+                number += message[i];
+            }
+        }
+    }
+
+    return -1;
 }

@@ -12,17 +12,25 @@ void Logger::out(std::ostream &ostream, char sign, CoStringR message)
     m_Mutex.unlock();
 }
 
-void Logger::info(CoStringR message) 
+void Logger::info(CoStringR message,  int level) 
 {
     out(std::cout, m_Signs[Sign::Info], message);
 }
 
-void Logger::error(CoStringR message) 
+void Logger::error(CoStringR message, int level) 
 {
     out(std::cerr, m_Signs[Sign::Error], message);
 }
 
-void Logger::progress(CoStringR message) 
+void Logger::progress(CoStringR message, int level) 
 {
     out(std::cout, m_Signs[Sign::Progress], message);
+}
+
+void Logger::addLogLevel(unsigned short logLevel)
+{
+    for (unsigned short i = 0; i < logLevel; ++i)
+    {
+        std::cout << "  ";
+    }
 }

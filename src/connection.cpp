@@ -119,7 +119,7 @@ bool Connection::changePort(int newPort)
     {
         if (m_Port == newPort)
         {
-            std::cerr << "Exact same port already. Abort...\n";
+            //std::cerr << "Exact same port already. Abort...\n";
             return false;
         }
 
@@ -131,7 +131,7 @@ bool Connection::changePort(int newPort)
 
             if (!isBinded)
             {
-                std::cerr << "Failed to bind new port. Abort...\n";
+                //std::cerr << "Failed to bind new port. Abort...\n";
                 // delete newSocket; -> should be added
                 return false;
             }
@@ -141,7 +141,7 @@ bool Connection::changePort(int newPort)
 
                 if (!listening)
                 {
-                    std::cerr << "Failed to listen for new socket [port changing]!\n";
+                   // std::cerr << "Failed to listen for new socket [port changing]!\n";
                     // delete newSocket;
                     return false;
                 }
@@ -152,9 +152,6 @@ bool Connection::changePort(int newPort)
                 m_Port = newPort;                                   
             }
         }
-
-        std::cerr << "Ok. Port changed!\n";
-
         return true;
     }
     return false;

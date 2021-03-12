@@ -9,9 +9,32 @@ const static unsigned int sleepTime { 500000 };
 
 static const int newPortTest { 50400 };
 
+static int portRequest(const std::string &message)
+{
+    if (message.size() >= 10 && message.size() <= 15)
+    {
+        if (message.compare(0, 9, "NewPort-<") == 0)
+        {
+            std::string number;
+            number.reserve();
+            for (unsigned int i = 9; i < message.size(); ++i)
+            {
+                if (message[i] == '>')
+                {
+                    return std::stoi(number);
+                }
+                number += message[i];
+            }
+        }
+    }
+
+    return -1;
+}
+
 void receiveMessagesWorkflow(Server *server_p)
 {
     Server &server = *server_p;
+    unsigned int newPortNumber = -1;
 
     std::string message;
     while (!server.clientDisconnected())
@@ -26,9 +49,11 @@ void receiveMessagesWorkflow(Server *server_p)
         }
         else
         {
-                if (message.compare(0, 7, "newPort") == 0)
+                newPortNumber = portRequest(message);
+                if (newPortNumber != -1)
                 {
-                    bool changed = server.changePort(newPortTest);
+                    Logger::info("Port requested: " + std::to_string(newPortNumber));
+                    bool changed = server.changePort(newPortNumber);
 
                     if (!changed)
                     {
@@ -58,7 +83,7 @@ void receiveMessagesWorkflow(Server *server_p)
 }
 
 int main() {
-    
+
         Server server("127.0.0.1", 7300);
 
         if (server.openedConnection())
