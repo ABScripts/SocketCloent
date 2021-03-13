@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string>
 
-#include "../include/logger.h"
+#include "../../shared/include/logger.h"
 #include "../include/client.h"
 #include <thread>
 
@@ -55,6 +55,7 @@ void receiveMessagesWorkflow(Client *client)
                 int port = portRequest(message);
                 if (port != -1)
                 {
+                    std::cout << "We have got port: " << port << std::endl;
                     client->sendMessage(successMessageServer);
 
                     while (true)  // waiting for server`s confirmation

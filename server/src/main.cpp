@@ -3,7 +3,7 @@
 #include <thread>
 
 #include "../include/server.h"
-#include "../include/logger.h"
+#include "../../shared/include/logger.h"
 
 const static std::string failureMessageServer { "failure" };
 const static std::string successMessageServer { "success" };
@@ -29,8 +29,32 @@ static int portRequest(const std::string &message)
             }
         }
     }
-
     return -1;
+}
+
+void changePortFlow(Server *server, int portNumber)
+{
+    bool changed = server->changePort(portNumber);
+
+    if (!changed)
+    {
+        Logger::error("Failed to change port!");
+        server->sendMessage(failureMessageServer);
+    }
+    else
+    {
+        Logger::progress("Port changed! Waiting for client to connect...");
+
+        bool clientConnected  = server->waitForClient(successMessageServer); 
+
+        if (!clientConnected)
+        {
+            Logger::error("Client failed to connect!");
+            return;
+        }
+
+        Logger::info("Client connected to changed port.");
+    }
 }
 
 void receiveMessagesWorkflow(Server *server_p)
@@ -60,27 +84,7 @@ void receiveMessagesWorkflow(Server *server_p)
                 }
                 else if (message == successMessageServer)
                 {
-                    bool changed = server.changePort(newPortNumber);
-
-                    if (!changed)
-                    {
-                        Logger::error("Failed to change port!");
-                        server.sendMessage(failureMessageServer);
-                    }
-                    else
-                    {
-                        Logger::progress("Port changed! Waiting for client to connect...");
-
-                        bool clientConnected  = server.waitForClient(successMessageServer); 
-
-                        if (!clientConnected)
-                        {
-                            Logger::error("Client failed to connect!");
-                            return;
-                        }
-
-                        Logger::info("Client connected to changed port.");
-                    }
+                    changePortFlow(server_p, newPortNumber);
                 }
             }
             else
@@ -89,27 +93,8 @@ void receiveMessagesWorkflow(Server *server_p)
                 if (port != -1)
                 {
                     Logger::info("Port requested: " + std::to_string(port));
-                    bool changed = server.changePort(port);
 
-                    if (!changed)
-                    {
-                        Logger::error("Failed to change port!");
-                        server.sendMessage("failure");
-                    }
-                    else
-                    {
-                        Logger::progress("Port changed! Waiting for client to connect...");
-
-                        bool clientConnected  = server.waitForClient("success"); 
-
-                        if (!clientConnected)
-                        {
-                            Logger::error("Client failed to connect!");
-                            return;
-                        }
-
-                        Logger::info("Client connected to changed port.");
-                    }
+                    changePortFlow(server_p, port);
                 }
                 else
                 {

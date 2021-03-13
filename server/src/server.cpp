@@ -1,5 +1,5 @@
 #include "../include/server.h"
-#include "../include/peermanager.h"
+#include "../../shared/include/peermanager.h"
 
 #include <iostream>
 
